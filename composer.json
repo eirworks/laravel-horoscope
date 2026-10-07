@@ -1,13 +1,13 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "rully-eirworks/horoscope",
+    "name": "eirworks/horoscope",
     "description": "",
     "keywords": [
         "laravel",
-        "rully-eirworks",
+        "eirworks",
         "horoscope"
     ],
-    "homepage": "https://github.com/rully-eirworks/horoscope",
+    "homepage": "https://github.com/eirworks/laravel-horoscope",
     "license": "MIT",
     "authors": [
         {
