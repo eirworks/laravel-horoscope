@@ -28,7 +28,7 @@ final class ScoreReader
     }
 
     /**
-     * Get the two luck text candidates for the given stat and score.
+     * Get the luck text candidates for the given stat and score.
      *
      * @return list<string>
      */
@@ -54,7 +54,7 @@ final class ScoreReader
     /**
      * Get one luck text for the given stat and score.
      *
-     * The text is picked deterministically from the two candidates using the
+     * The text is picked deterministically from the candidates using the
      * given seed, so the same seed, stat, and score always return the same
      * text. When no seed is given, the stat and score are used as the seed.
      */

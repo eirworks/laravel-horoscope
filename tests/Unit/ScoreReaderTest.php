@@ -27,10 +27,10 @@ it('reads a score into its level', function (int $score, ScoreLevel $level) {
     [90, ScoreLevel::Excellent],
 ]);
 
-it('provides exactly two luck texts for every stat and level', function (string $stat, int $score) {
+it('provides exactly ten luck texts for every stat and level', function (string $stat, int $score) {
     $texts = (new ScoreReader)->texts($stat, $score);
 
-    expect($texts)->toHaveCount(2);
+    expect($texts)->toHaveCount(10)->and(array_unique($texts))->toHaveCount(10);
 
     foreach ($texts as $text) {
         expect($text)->toBeString()->not->toBe('');

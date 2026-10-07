@@ -151,15 +151,15 @@ $reader->read(85)->label();  // 'Excellent'
 | good      | 61-80  |
 | excellent | 81-100 |
 
-Every stat keeps two luck texts for each level in `lang/en/luck.php`. Pick one
-deterministically with a seed, or read both candidates:
+Every stat keeps ten luck texts for each level in `lang/en/luck.php`. Pick one
+deterministically with a seed, or read all candidates:
 
 ```php
 $reading = Horoscope::generate($user->id);
 $seed = $user->id; // any stable value
 
 $reader->text('love', $reading->love, $seed); // one luck text
-$reader->texts('love', $reading->love);       // both candidate texts
+$reader->texts('love', $reading->love);       // all candidate texts
 ```
 
 `ScoreReader::STATS` lists the stats that have luck texts: `love`, `career`,
