@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Horoscope\Horoscope;
 
-use Horoscope\Horoscope\Console\Commands\HoroscopeCommand;
 use Illuminate\Support\ServiceProvider;
 
 class HoroscopeServiceProvider extends ServiceProvider
@@ -39,23 +38,7 @@ class HoroscopeServiceProvider extends ServiceProvider
         ], ['horoscope', 'horoscope-config']);
 
         $this->publishes([
-            __DIR__.'/../resources/views' => resource_path('views/vendor/horoscope'),
-        ], ['horoscope', 'horoscope-views']);
-
-        $this->publishes([
             __DIR__.'/../lang' => $this->app->langPath('vendor/horoscope'),
         ], ['horoscope', 'horoscope-lang']);
-
-        $this->publishes([
-            __DIR__.'/../public' => public_path('vendor/horoscope'),
-        ], ['horoscope', 'horoscope-assets']);
-
-        $this->publishesMigrations([
-            __DIR__.'/../database/migrations' => database_path('migrations'),
-        ], ['horoscope', 'horoscope-migrations']);
-
-        $this->commands([
-            HoroscopeCommand::class,
-        ]);
     }
 }
