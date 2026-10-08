@@ -10,7 +10,7 @@ metadata:
 # Horoscope
 
 Use this skill when a Laravel application needs to generate daily horoscope
-readings with the `rully-eirworks/horoscope` package.
+readings with the `eirworks/horoscope` package.
 
 ## Primary Goal
 
@@ -21,7 +21,7 @@ readings with the `rully-eirworks/horoscope` package.
 
 ### 1. Install and configure
 
-- require `rully-eirworks/horoscope` in the Laravel application
+- require `eirworks/horoscope` in the Laravel application
 - optionally publish the config: `php artisan vendor:publish --tag=horoscope-config`
 - adjust `config/horoscope.php` only when the defaults do not fit:
   `cache.enabled`, `cache.store`, `cache.prefix`, and `cache.ttl`
@@ -59,8 +59,9 @@ $reading->overall; // 1-100 rounded average
 - the same number and sign always yield the same scores, and the sign reading is
   cached per `{prefix}:{number}:{sign}` (for example `horoscope:42:virgo`)
 - `Horoscope\Horoscope\ZodiacSign` holds the twelve signs (`aries` through
-  `pisces`), resolves a name with `ZodiacSign::fromName('virgo')`, and exposes a
-  translated `label()`
+  `pisces`), resolves a name with `ZodiacSign::fromName('virgo')`, resolves the
+  sign for a date with `ZodiacSign::fromDate($date)`, and exposes a translated
+  `label()`
 - `HoroscopeResult` implements `Arrayable` and `JsonSerializable`
 - convert with `toArray()`, `toJson()`, `json_encode()`, or
   `HoroscopeResult::fromArray($array)`

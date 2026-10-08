@@ -110,7 +110,8 @@ $reading = Horoscope::generateForSign($user->id, ZodiacSign::Virgo);
 ```
 
 `ZodiacSign` lists the twelve signs (`aries` through `pisces`), resolves a name
-with `ZodiacSign::fromName('virgo')`, and exposes a translated `label()`. Sign
+with `ZodiacSign::fromName('virgo')`, resolves a birth date with
+`ZodiacSign::fromDate($date)`, and exposes a translated `label()`. Sign
 readings are cached under `{prefix}:{number}:{sign}` and follow the configured
 `cache.ttl`.
 
