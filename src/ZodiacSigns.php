@@ -50,6 +50,26 @@ final class ZodiacSigns
     ];
 
     /**
+     * The classical element of each sign, keyed by codename.
+     *
+     * @var array<string, ZodiacElement>
+     */
+    private const array ELEMENTS = [
+        'aries' => ZodiacElement::Fire,
+        'taurus' => ZodiacElement::Earth,
+        'gemini' => ZodiacElement::Air,
+        'cancer' => ZodiacElement::Water,
+        'leo' => ZodiacElement::Fire,
+        'virgo' => ZodiacElement::Earth,
+        'libra' => ZodiacElement::Air,
+        'scorpio' => ZodiacElement::Water,
+        'sagittarius' => ZodiacElement::Fire,
+        'capricorn' => ZodiacElement::Earth,
+        'aquarius' => ZodiacElement::Air,
+        'pisces' => ZodiacElement::Water,
+    ];
+
+    /**
      * Get the data of every zodiac sign, in calendar order.
      *
      * @return list<ZodiacSignData>
@@ -71,6 +91,7 @@ final class ZodiacSigns
             icon: self::ICONS[$sign->value],
             startDate: self::RANGES[$sign->value]['start'],
             endDate: self::RANGES[$sign->value]['end'],
+            element: self::ELEMENTS[$sign->value],
         );
     }
 }

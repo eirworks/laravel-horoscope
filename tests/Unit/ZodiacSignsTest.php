@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Horoscope\Horoscope\ZodiacElement;
 use Horoscope\Horoscope\ZodiacSign;
 use Horoscope\Horoscope\ZodiacSignData;
 use Horoscope\Horoscope\ZodiacSigns;
@@ -22,6 +23,7 @@ it('returns the data of a sign', function (
     string $icon,
     string $startDate,
     string $endDate,
+    ZodiacElement $element,
 ) {
     $data = ZodiacSigns::get($sign);
 
@@ -30,20 +32,21 @@ it('returns the data of a sign', function (
         ->and($data->codename)->toBe($codename)
         ->and($data->icon)->toBe($icon)
         ->and($data->startDate)->toBe($startDate)
-        ->and($data->endDate)->toBe($endDate);
+        ->and($data->endDate)->toBe($endDate)
+        ->and($data->element)->toBe($element);
 })->with([
-    [ZodiacSign::Aries, 'Aries', 'aries', '♈', '03-21', '04-19'],
-    [ZodiacSign::Taurus, 'Taurus', 'taurus', '♉', '04-20', '05-20'],
-    [ZodiacSign::Gemini, 'Gemini', 'gemini', '♊', '05-21', '06-20'],
-    [ZodiacSign::Cancer, 'Cancer', 'cancer', '♋', '06-21', '07-22'],
-    [ZodiacSign::Leo, 'Leo', 'leo', '♌', '07-23', '08-22'],
-    [ZodiacSign::Virgo, 'Virgo', 'virgo', '♍', '08-23', '09-22'],
-    [ZodiacSign::Libra, 'Libra', 'libra', '♎', '09-23', '10-22'],
-    [ZodiacSign::Scorpio, 'Scorpio', 'scorpio', '♏', '10-23', '11-21'],
-    [ZodiacSign::Sagittarius, 'Sagittarius', 'sagittarius', '♐', '11-22', '12-21'],
-    [ZodiacSign::Capricorn, 'Capricorn', 'capricorn', '♑', '12-22', '01-19'],
-    [ZodiacSign::Aquarius, 'Aquarius', 'aquarius', '♒', '01-20', '02-18'],
-    [ZodiacSign::Pisces, 'Pisces', 'pisces', '♓', '02-19', '03-20'],
+    [ZodiacSign::Aries, 'Aries', 'aries', '♈', '03-21', '04-19', ZodiacElement::Fire],
+    [ZodiacSign::Taurus, 'Taurus', 'taurus', '♉', '04-20', '05-20', ZodiacElement::Earth],
+    [ZodiacSign::Gemini, 'Gemini', 'gemini', '♊', '05-21', '06-20', ZodiacElement::Air],
+    [ZodiacSign::Cancer, 'Cancer', 'cancer', '♋', '06-21', '07-22', ZodiacElement::Water],
+    [ZodiacSign::Leo, 'Leo', 'leo', '♌', '07-23', '08-22', ZodiacElement::Fire],
+    [ZodiacSign::Virgo, 'Virgo', 'virgo', '♍', '08-23', '09-22', ZodiacElement::Earth],
+    [ZodiacSign::Libra, 'Libra', 'libra', '♎', '09-23', '10-22', ZodiacElement::Air],
+    [ZodiacSign::Scorpio, 'Scorpio', 'scorpio', '♏', '10-23', '11-21', ZodiacElement::Water],
+    [ZodiacSign::Sagittarius, 'Sagittarius', 'sagittarius', '♐', '11-22', '12-21', ZodiacElement::Fire],
+    [ZodiacSign::Capricorn, 'Capricorn', 'capricorn', '♑', '12-22', '01-19', ZodiacElement::Earth],
+    [ZodiacSign::Aquarius, 'Aquarius', 'aquarius', '♒', '01-20', '02-18', ZodiacElement::Air],
+    [ZodiacSign::Pisces, 'Pisces', 'pisces', '♓', '02-19', '03-20', ZodiacElement::Water],
 ]);
 
 it('uses a downcased alphanumeric dash codename', function () {
@@ -60,6 +63,7 @@ it('converts the data of a sign to an array', function () {
         'icon' => '♍',
         'start_date' => '08-23',
         'end_date' => '09-22',
+        'element' => ['name' => 'Earth', 'icon' => '🌍'],
     ]);
 });
 

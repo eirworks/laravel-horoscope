@@ -10,7 +10,7 @@ use JsonSerializable;
 /**
  * The descriptive data of a zodiac sign.
  *
- * @implements Arrayable<string, string>
+ * @implements Arrayable<string, int|string|array<string, string>>
  */
 final readonly class ZodiacSignData implements Arrayable, JsonSerializable
 {
@@ -21,12 +21,13 @@ final readonly class ZodiacSignData implements Arrayable, JsonSerializable
         public string $icon,
         public string $startDate,
         public string $endDate,
+        public ZodiacElement $element,
     ) {}
 
     /**
      * Get the array representation of the sign data.
      *
-     * @return array{sign: string, name: string, codename: string, icon: string, start_date: string, end_date: string}
+     * @return array{sign: string, name: string, codename: string, icon: string, start_date: string, end_date: string, element: array{name: string, icon: string}}
      */
     public function toArray(): array
     {
@@ -37,6 +38,7 @@ final readonly class ZodiacSignData implements Arrayable, JsonSerializable
             'icon' => $this->icon,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,
+            'element' => $this->element->toArray(),
         ];
     }
 
@@ -51,7 +53,7 @@ final readonly class ZodiacSignData implements Arrayable, JsonSerializable
     /**
      * Prepare the sign data for JSON serialization.
      *
-     * @return array{sign: string, name: string, codename: string, icon: string, start_date: string, end_date: string}
+     * @return array{sign: string, name: string, codename: string, icon: string, start_date: string, end_date: string, element: array{name: string, icon: string}}
      */
     public function jsonSerialize(): array
     {

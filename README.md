@@ -143,14 +143,41 @@ $virgo->codename;  // 'virgo'   downcased alphanumeric dash
 $virgo->icon;      // '♍'       emoji
 $virgo->startDate; // '08-23'   month-day, inclusive
 $virgo->endDate;   // '09-22'   month-day, inclusive
+$virgo->element;   // ZodiacElement::Earth
+
+$virgo->element->value; // 'earth'
+$virgo->element->label(); // 'Earth'
+$virgo->element->icon();  // '🌍'
 
 $virgo->toArray();
 // ['sign' => 'virgo', 'name' => 'Virgo', 'codename' => 'virgo',
-//  'icon' => '♍', 'start_date' => '08-23', 'end_date' => '09-22']
+//  'icon' => '♍', 'start_date' => '08-23', 'end_date' => '09-22',
+//  'element' => ['name' => 'Earth', 'icon' => '🌍']]
 ```
 
 `ZodiacSignData` implements `Arrayable` and `JsonSerializable`, so it can be
 converted with `toArray()`, `toJson()`, or `json_encode()`.
+
+### Zodiac elements
+
+The twelve signs belong to the four classical elements: `fire` (Aries, Leo,
+Sagittarius), `earth` (Taurus, Virgo, Capricorn), `air` (Gemini, Libra,
+Aquarius), and `water` (Cancer, Scorpio, Pisces). `ZodiacElement` is a backed
+enum exposing a translated `label()` and an emoji `icon()`:
+
+```php
+use Horoscope\Horoscope\ZodiacElement;
+
+ZodiacElement::Fire->value; // 'fire'
+ZodiacElement::Fire->label(); // 'Fire'
+ZodiacElement::Fire->icon();  // '🔥'
+
+ZodiacElement::Water->toArray();
+// ['name' => 'Water', 'icon' => '💧']
+```
+
+`ZodiacElement` implements `Arrayable` and `JsonSerializable`. Element labels
+live in `lang/en/elements.php`, so publish `horoscope-lang` to translate them.
 
 ### Lucky colors
 

@@ -70,7 +70,8 @@ $reading->luckyColor->hex;  // '#FFD700'
 - `Horoscope\Horoscope\ZodiacSigns::all()` returns the twelve `ZodiacSignData`
   objects in calendar order and `ZodiacSigns::get($sign)` returns one; each
   exposes `$name` (translated label), `$codename` (downcased alphanumeric
-  dash), `$icon` (emoji), `$startDate`, and `$endDate` (inclusive `m-d`)
+  dash), `$icon` (emoji), `$startDate`, and `$endDate` (inclusive `m-d`), plus
+  `$element` (a `ZodiacElement` enum with `label()` and `icon()`)
 - `ZodiacSignData` implements `Arrayable` and `JsonSerializable`
 - every reading carries a matched `ZodiacSign` (`$reading->match`), a
   `luckyNumber` from 1 to 99, and a `LuckyColor` (`$reading->luckyColor`); a
@@ -79,8 +80,8 @@ $reading->luckyColor->hex;  // '#FFD700'
   `resources/colors/colors.php`; `LuckyColors::get($index)` and
   `LuckyColors::fromName($name)` resolve a single `LuckyColor`, and each exposes
   `$name` and `$hex`
-- `LuckyColor`, `ZodiacSignData`, and `HoroscopeResult` implement `Arrayable`
-  and `JsonSerializable`
+- `LuckyColor`, `ZodiacSignData`, `ZodiacElement`, and `HoroscopeResult`
+  implement `Arrayable` and `JsonSerializable`
 - convert with `toArray()`, `toJson()`, `json_encode()`, or
   `HoroscopeResult::fromArray($array)`
 
@@ -111,11 +112,14 @@ Read before executing:
 
 - `config/horoscope.php` for cache options
 - `lang/en/luck.php` for score levels and luck text resources
-- `lang/en/zodiac.php` for zodiac sign names
+- `lang/en/zodiac.php` for zodiac sign names and `lang/en/elements.php` for
+  zodiac element names
 - `Horoscope\Horoscope\HoroscopeResult` for the reading object
 - `Horoscope\Horoscope\ZodiacSign` for zodiac signs
 - `Horoscope\Horoscope\ZodiacSigns` and `Horoscope\Horoscope\ZodiacSignData` for
-  sign names, codenames, icons, and date ranges
+  sign names, codenames, icons, date ranges, and elements
+- `Horoscope\Horoscope\ZodiacElement` for the four classical elements (`fire`,
+  `earth`, `air`, `water`)
 - `Horoscope\Horoscope\LuckyColors` and `Horoscope\Horoscope\LuckyColor` for
   lucky color names and hex codes
 - `Horoscope\Horoscope\ScoreReader` and `Horoscope\Horoscope\ScoreLevel` for
@@ -160,6 +164,9 @@ $virgo->codename;  // 'virgo'   downcased alphanumeric dash
 $virgo->icon;      // '♍'       emoji
 $virgo->startDate; // '08-23'
 $virgo->endDate;   // '09-22'
+$virgo->element;   // ZodiacElement::Earth
+$virgo->element->label(); // 'Earth'
+$virgo->element->icon();  // '🌍'
 $virgo->toArray();
 ```
 
