@@ -26,10 +26,20 @@ it('generates a reading for a zodiac sign with every category score between 1 an
 
     expect($result)->toBeInstanceOf(HoroscopeResult::class);
 
-    foreach ($result->toArray() as $score) {
-        expect($score)->toBeGreaterThanOrEqual(1)->toBeLessThanOrEqual(100);
+    foreach (['love', 'career', 'money', 'health', 'social'] as $stat) {
+        expect($result->{$stat})->toBeGreaterThanOrEqual(1)->toBeLessThanOrEqual(100);
     }
+
+    expect($result->overall)->toBeGreaterThanOrEqual(1)->toBeLessThanOrEqual(100);
 });
+
+it('never matches a sign reading with its own sign', function (ZodiacSign $sign) {
+    config()->set('horoscope.cache.enabled', false);
+
+    $result = app(Horoscope::class)->generateForSign(42, $sign);
+
+    expect($result->match)->not->toBe($sign);
+})->with(ZodiacSign::cases());
 
 it('accepts a zodiac sign enum', function () {
     config()->set('horoscope.cache.enabled', false);
@@ -65,6 +75,19 @@ it('generates a different reading for a different number or sign', function () {
 it('throws for an unknown sign name', function () {
     app(Horoscope::class)->generateForSign(42, 'ophiuchus');
 })->throws(InvalidArgumentException::class);
+
+it('generates the same match, lucky number, and lucky color for the same number and sign', function () {
+    config()->set('horoscope.cache.enabled', false);
+
+    $horoscope = app(Horoscope::class);
+
+    $first = $horoscope->generateForSign(42, 'virgo');
+    $second = $horoscope->generateForSign(42, 'virgo');
+
+    expect($second->match)->toBe($first->match)
+        ->and($second->luckyNumber)->toBe($first->luckyNumber)
+        ->and($second->luckyColor)->toEqual($first->luckyColor);
+});
 
 it('returns the cached reading for the same number and sign', function () {
     $horoscope = app(Horoscope::class);

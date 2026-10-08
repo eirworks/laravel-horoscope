@@ -10,7 +10,7 @@ use JsonSerializable;
 /**
  * An immutable horoscope reading.
  *
- * @implements Arrayable<string, int>
+ * @implements Arrayable<string, int|string|array<string, string>>
  */
 final readonly class HoroscopeResult implements Arrayable, JsonSerializable
 {
@@ -25,6 +25,9 @@ final readonly class HoroscopeResult implements Arrayable, JsonSerializable
         public int $money,
         public int $health,
         public int $social,
+        public ZodiacSign $match,
+        public int $luckyNumber,
+        public LuckyColor $luckyColor,
     ) {
         $this->overall = self::average([
             $this->love,
@@ -38,23 +41,31 @@ final readonly class HoroscopeResult implements Arrayable, JsonSerializable
     /**
      * Build a reading from its array representation.
      *
-     * @param  array{love: int, career: int, money: int, health: int, social: int, overall?: int}  $data
+     * @param  array{love: int, career: int, money: int, health: int, social: int, match: ZodiacSign|string, lucky_number: int, lucky_color: LuckyColor|array{name: string, hex: string}, overall?: int}  $data
      */
     public static function fromArray(array $data): self
     {
+        $match = $data['match'];
+        $color = $data['lucky_color'];
+
         return new self(
             love: $data['love'],
             career: $data['career'],
             money: $data['money'],
             health: $data['health'],
             social: $data['social'],
+            match: $match instanceof ZodiacSign ? $match : ZodiacSign::fromName($match),
+            luckyNumber: $data['lucky_number'],
+            luckyColor: $color instanceof LuckyColor
+                ? $color
+                : new LuckyColor(name: $color['name'], hex: $color['hex']),
         );
     }
 
     /**
      * Get the array representation of the reading.
      *
-     * @return array{love: int, career: int, money: int, health: int, social: int, overall: int}
+     * @return array{love: int, career: int, money: int, health: int, social: int, overall: int, match: string, lucky_number: int, lucky_color: array{name: string, hex: string}}
      */
     public function toArray(): array
     {
@@ -65,6 +76,9 @@ final readonly class HoroscopeResult implements Arrayable, JsonSerializable
             'health' => $this->health,
             'social' => $this->social,
             'overall' => $this->overall,
+            'match' => $this->match->value,
+            'lucky_number' => $this->luckyNumber,
+            'lucky_color' => $this->luckyColor->toArray(),
         ];
     }
 
@@ -79,7 +93,7 @@ final readonly class HoroscopeResult implements Arrayable, JsonSerializable
     /**
      * Prepare the reading for JSON serialization.
      *
-     * @return array{love: int, career: int, money: int, health: int, social: int, overall: int}
+     * @return array{love: int, career: int, money: int, health: int, social: int, overall: int, match: string, lucky_number: int, lucky_color: array{name: string, hex: string}}
      */
     public function jsonSerialize(): array
     {

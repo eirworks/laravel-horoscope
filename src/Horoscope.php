@@ -27,6 +27,16 @@ class Horoscope
      */
     private const int MAX_SCORE = 100;
 
+    /**
+     * The lowest possible lucky number.
+     */
+    private const int MIN_LUCKY_NUMBER = 1;
+
+    /**
+     * The highest possible lucky number.
+     */
+    private const int MAX_LUCKY_NUMBER = 99;
+
     public function __construct(private readonly CacheFactory $cache) {}
 
     /**
@@ -48,7 +58,7 @@ class Horoscope
     ): HoroscopeResult {
         $date = $this->normalizeDate($date);
 
-        return $this->read($number, $date->toDateString(), $date, $force);
+        return $this->read($number, $date->toDateString(), $date, null, $force);
     }
 
     /**
@@ -71,7 +81,7 @@ class Horoscope
     ): HoroscopeResult {
         $sign = $sign instanceof ZodiacSign ? $sign : ZodiacSign::fromName($sign);
 
-        return $this->read($number, $sign->value, CarbonImmutable::today(), $force);
+        return $this->read($number, $sign->value, CarbonImmutable::today(), $sign, $force);
     }
 
     /**
@@ -81,6 +91,7 @@ class Horoscope
         int|string $number,
         string $discriminator,
         CarbonImmutable $expiresAt,
+        ?ZodiacSign $sign,
         bool $force,
     ): HoroscopeResult {
         $store = $this->cacheEnabled() ? $this->cacheStore() : null;
@@ -94,7 +105,7 @@ class Horoscope
             }
         }
 
-        $result = $this->roll($number, $discriminator, $force);
+        $result = $this->roll($number, $discriminator, $sign, $force);
 
         $store?->put($key, $result, $this->expiration($expiresAt));
 
@@ -118,15 +129,21 @@ class Horoscope
     }
 
     /**
-     * Roll the category scores for the given number and discriminator.
+     * Roll the scores, match, and lucky values for the given inputs.
      */
-    private function roll(int|string $number, string $discriminator, bool $force): HoroscopeResult
-    {
+    private function roll(
+        int|string $number,
+        string $discriminator,
+        ?ZodiacSign $sign,
+        bool $force,
+    ): HoroscopeResult {
         $seed = $force
             ? random_int(self::MIN_SCORE, PHP_INT_MAX)
             : crc32($number.'|'.$discriminator);
 
         $randomizer = new Randomizer(new Mt19937($seed));
+
+        $colors = LuckyColors::all();
 
         return new HoroscopeResult(
             love: $randomizer->getInt(self::MIN_SCORE, self::MAX_SCORE),
@@ -134,7 +151,29 @@ class Horoscope
             money: $randomizer->getInt(self::MIN_SCORE, self::MAX_SCORE),
             health: $randomizer->getInt(self::MIN_SCORE, self::MAX_SCORE),
             social: $randomizer->getInt(self::MIN_SCORE, self::MAX_SCORE),
+            match: $this->pickMatch($randomizer, $sign),
+            luckyNumber: $randomizer->getInt(self::MIN_LUCKY_NUMBER, self::MAX_LUCKY_NUMBER),
+            luckyColor: $colors[$randomizer->getInt(0, count($colors) - 1)],
         );
+    }
+
+    /**
+     * Pick the zodiac sign to match the reading with.
+     *
+     * When the reading is tied to a sign, that sign is excluded so a reading
+     * never matches with itself.
+     */
+    private function pickMatch(Randomizer $randomizer, ?ZodiacSign $sign): ZodiacSign
+    {
+        $candidates = [];
+
+        foreach (ZodiacSign::cases() as $candidate) {
+            if ($candidate !== $sign) {
+                $candidates[] = $candidate;
+            }
+        }
+
+        return $candidates[$randomizer->getInt(0, count($candidates) - 1)];
     }
 
     /**

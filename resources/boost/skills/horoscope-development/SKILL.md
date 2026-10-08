@@ -44,12 +44,17 @@ use Horoscope\Horoscope\Facades\Horoscope;
 
 $reading = Horoscope::generate($user->id);
 
-$reading->love;    // 1-100
-$reading->career;  // 1-100
-$reading->money;   // 1-100
-$reading->health;  // 1-100
-$reading->social;  // 1-100
-$reading->overall; // 1-100 rounded average
+$reading->love;         // 1-100
+$reading->career;       // 1-100
+$reading->money;        // 1-100
+$reading->health;       // 1-100
+$reading->social;       // 1-100
+$reading->overall;      // 1-100 rounded average
+$reading->match;        // ZodiacSign enum, e.g. ZodiacSign::Virgo
+$reading->luckyNumber;  // 1-99
+$reading->luckyColor;   // LuckyColor value object
+$reading->luckyColor->name; // 'gold'
+$reading->luckyColor->hex;  // '#FFD700'
 ```
 
 ### 3. Work with the result
@@ -62,7 +67,20 @@ $reading->overall; // 1-100 rounded average
   `pisces`), resolves a name with `ZodiacSign::fromName('virgo')`, resolves the
   sign for a date with `ZodiacSign::fromDate($date)`, and exposes a translated
   `label()`
-- `HoroscopeResult` implements `Arrayable` and `JsonSerializable`
+- `Horoscope\Horoscope\ZodiacSigns::all()` returns the twelve `ZodiacSignData`
+  objects in calendar order and `ZodiacSigns::get($sign)` returns one; each
+  exposes `$name` (translated label), `$codename` (downcased alphanumeric
+  dash), `$icon` (emoji), `$startDate`, and `$endDate` (inclusive `m-d`)
+- `ZodiacSignData` implements `Arrayable` and `JsonSerializable`
+- every reading carries a matched `ZodiacSign` (`$reading->match`), a
+  `luckyNumber` from 1 to 99, and a `LuckyColor` (`$reading->luckyColor`); a
+  sign reading never matches with its own sign
+- `Horoscope\Horoscope\LuckyColors::all()` returns the `LuckyColor` palette from
+  `resources/colors/colors.php`; `LuckyColors::get($index)` and
+  `LuckyColors::fromName($name)` resolve a single `LuckyColor`, and each exposes
+  `$name` and `$hex`
+- `LuckyColor`, `ZodiacSignData`, and `HoroscopeResult` implement `Arrayable`
+  and `JsonSerializable`
 - convert with `toArray()`, `toJson()`, `json_encode()`, or
   `HoroscopeResult::fromArray($array)`
 
@@ -96,6 +114,10 @@ Read before executing:
 - `lang/en/zodiac.php` for zodiac sign names
 - `Horoscope\Horoscope\HoroscopeResult` for the reading object
 - `Horoscope\Horoscope\ZodiacSign` for zodiac signs
+- `Horoscope\Horoscope\ZodiacSigns` and `Horoscope\Horoscope\ZodiacSignData` for
+  sign names, codenames, icons, and date ranges
+- `Horoscope\Horoscope\LuckyColors` and `Horoscope\Horoscope\LuckyColor` for
+  lucky color names and hex codes
 - `Horoscope\Horoscope\ScoreReader` and `Horoscope\Horoscope\ScoreLevel` for
   score levels and luck texts
 
@@ -124,11 +146,40 @@ $reading = Horoscope::generateForSign($user->id, ZodiacSign::Virgo);
 $reading = Horoscope::generateForSign($user->id, 'virgo', force: true);
 ```
 
+- List the signs or read one sign's display metadata:
+
+```php
+use Horoscope\Horoscope\ZodiacSign;
+use Horoscope\Horoscope\ZodiacSigns;
+
+$signs = ZodiacSigns::all();                   // list<ZodiacSignData>
+$virgo = ZodiacSigns::get(ZodiacSign::Virgo);
+
+$virgo->name;      // 'Virgo'   translated label
+$virgo->codename;  // 'virgo'   downcased alphanumeric dash
+$virgo->icon;      // '♍'       emoji
+$virgo->startDate; // '08-23'
+$virgo->endDate;   // '09-22'
+$virgo->toArray();
+```
+
 - Store or transfer a reading as an array and restore it later:
 
 ```php
 $data = Horoscope::generate($user->id)->toArray();
 $reading = \Horoscope\Horoscope\HoroscopeResult::fromArray($data);
+```
+
+- Show the match and lucky values of a reading:
+
+```php
+$reading = Horoscope::generateForSign($user->id, 'leo');
+
+$reading->match->value;      // e.g. 'virgo'
+$reading->match->label();    // e.g. 'Virgo'
+$reading->luckyNumber;       // 1-99
+$reading->luckyColor->name;  // e.g. 'gold'
+$reading->luckyColor->hex;   // e.g. '#FFD700'
 ```
 
 - Show a level and luck text for each stat:

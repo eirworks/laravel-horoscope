@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 use Horoscope\Horoscope\Horoscope;
 use Horoscope\Horoscope\HoroscopeResult;
+use Horoscope\Horoscope\LuckyColor;
+use Horoscope\Horoscope\LuckyColors;
+use Horoscope\Horoscope\ZodiacSign;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 
@@ -25,9 +28,24 @@ it('generates a reading with every category score between 1 and 100', function (
 
     expect($result)->toBeInstanceOf(HoroscopeResult::class);
 
-    foreach ($result->toArray() as $score) {
-        expect($score)->toBeGreaterThanOrEqual(1)->toBeLessThanOrEqual(100);
+    foreach (['love', 'career', 'money', 'health', 'social'] as $stat) {
+        expect($result->{$stat})->toBeGreaterThanOrEqual(1)->toBeLessThanOrEqual(100);
     }
+
+    expect($result->overall)->toBeGreaterThanOrEqual(1)->toBeLessThanOrEqual(100);
+});
+
+it('generates a match, lucky number, and lucky color for every reading', function () {
+    $result = app(Horoscope::class)->generate(42, '2026-10-07');
+
+    expect($result->match)->toBeInstanceOf(ZodiacSign::class)
+        ->and($result->luckyNumber)->toBeGreaterThanOrEqual(1)->toBeLessThanOrEqual(99)
+        ->and($result->luckyColor)->toBeInstanceOf(LuckyColor::class)
+        ->and($result->luckyColor->hex)->toBeString()->toMatch('/^#[0-9A-F]{6}$/');
+
+    $colors = LuckyColors::all();
+
+    expect($colors)->toContainEqual($result->luckyColor);
 });
 
 it('generates the same reading for the same number and date', function () {
@@ -71,7 +89,22 @@ it('accepts a date time instance', function () {
         ->toBe($horoscope->generate(7, '2026-10-07')->toArray());
 });
 
+it('generates the same match, lucky number, and lucky color for the same number and date', function () {
+    config()->set('horoscope.cache.enabled', false);
+
+    $horoscope = app(Horoscope::class);
+
+    $first = $horoscope->generate(42, '2026-10-07');
+    $second = $horoscope->generate(42, '2026-10-07');
+
+    expect($second->match)->toBe($first->match)
+        ->and($second->luckyNumber)->toBe($first->luckyNumber)
+        ->and($second->luckyColor)->toEqual($first->luckyColor);
+});
+
 it('returns the cached reading for the same number and date', function () {
+    $this->travelTo(new DateTimeImmutable('2026-10-07 10:00:00'));
+
     $horoscope = app(Horoscope::class);
 
     $first = $horoscope->generate(42, '2026-10-07');
@@ -81,6 +114,8 @@ it('returns the cached reading for the same number and date', function () {
 });
 
 it('regenerates and replaces the cached reading when forced', function () {
+    $this->travelTo(new DateTimeImmutable('2026-10-07 10:00:00'));
+
     $horoscope = app(Horoscope::class);
 
     $first = $horoscope->generate(42, '2026-10-07');
